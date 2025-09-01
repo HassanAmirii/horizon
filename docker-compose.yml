@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  # Service for your Express app
+  horizon:
+    build: .
+    # Map port 3000 on your computer to port 3000 in the container
+    ports:
+      - "3000:3000"
+    # Set environment variables for the container
+    env_file:
+      - ./.env
+    # Make sure this service doesn't start until the database is up
+    depends_on:
+      - mongo
+
+  # Service for the MongoDB database
+  mongo:
+    image: mongo:latest
+    # Map the default MongoDB port for local access (optional, but useful)
+    ports:
+      - "27017:27017"
+    # Use a named volume to persist your data even if the container is removed
+    volumes:
+      - mongo-data:/data/db
+
+# Define the named volume
+volumes:
+  mongo-data:
