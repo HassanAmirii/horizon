@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const app = require("./middleware/app");
 const dbURI = process.env.MONGODB_URI;
 const jwt = require("jsonwebtoken");
-const task = require("./models/tasks");
+const Task = require("./models/tasks");
+const User = require("./middleware/app");
 
 mongoose
   .connect(dbURI)
