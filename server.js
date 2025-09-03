@@ -1,5 +1,5 @@
 require("dotenv").config();
-const bcrpt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const app = require("./middleware/app");
 const dbURI = process.env.MONGODB_URI;
@@ -35,33 +35,44 @@ mongoose
     // login route with a signed token
     app.post("/login", async (req, res) => {
       const { username, password } = req.body;
-      const user = await User.findOne({ username });
-      if (!user && !(await bcrpt.compare(User.password, password))) {
-        return res.status(401).json({ error: "invalid credentials" });
-      }
 
       try {
+        // Check if the user exists
+        const user = await User.findOne({ username });
+        if (!user) {
+          return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        // Compare the submitted password with the stored hashed password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+          return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        // If both checks pass, create the JWT payload
+        const payload = {
+          id: user._id,
+          username: user.username,
+          admin: user.isAdmin,
+        };
+
+        // Sign the token
+        const token = jwt.sign(payload, process.env.JWT_SECRET, {
+          expiresIn: "1h",
+        });
+
+        // Send the final response and exit
         res.status(200).json({
-          message: `you have  succesfully login ${username}`,
+          message: "User logged in successfully",
+          token: token,
         });
       } catch (error) {
+        console.error(error); // Log the error for debugging
         res.status(500).json({
-          message: error.message,
+          message: "An internal server error occurred",
         });
       }
-
-      const payload = {
-        id: user._id,
-        username: user.username,
-      };
-
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "1hr",
-      });
-
-      res.json({ token });
     });
-
     app.get("/dashboard", userAuth, (req, res) => {
       res.status(200).json({ message: `welcome ${req.payload.username}` });
     });
