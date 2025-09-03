@@ -69,8 +69,39 @@ mongoose
         });
       }
     });
+
+    app.post("/task", userAuth, async (req, res) => {
+      try {
+        const { title, description, owner } = req.body;
+        const newTask = new Task({ title, description, owner: req.payload.id });
+        await newTask.save();
+
+        res
+          .status(201)
+          .json({ message: "new task created successfully", task: newTask });
+      } catch (error) {
+        res.status(500).json({ message: error.message });
+      }
+    });
+
+    // USER DASHBOARD (protected user route)
     app.get("/dashboard", userAuth, (req, res) => {
       res.status(200).json({ message: `welcome ${req.payload.username}` });
+    });
+
+    //protected admin route: GET ALL USER PROFILE
+    app.get("/user", adminAuth, (req, res) => {
+      try {
+        const users = User.find({});
+        if (!users) {
+          res.status(404).json({ message: "no user profile in database" });
+        }
+        res
+          .status(200)
+          .json({ message: "users succesfully retrieved ", users: users });
+      } catch (error) {
+        res.status(500).json({ message: error.message });
+      }
     });
 
     // horizon listener

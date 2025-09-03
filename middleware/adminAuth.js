@@ -1,6 +1,6 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const adminAuth = (res, req, next) => {
+const adminAuth = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {

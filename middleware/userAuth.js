@@ -1,7 +1,7 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const auth = (res, req, next) => {
-  const authHeader = req.headers.authorization;
+const auth = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
 
   if (!authHeader) {
     res.status(401).json({ message: "access denied, no authorization" });
