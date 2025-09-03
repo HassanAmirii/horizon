@@ -6,6 +6,8 @@ const dbURI = process.env.MONGODB_URI;
 const jwt = require("jsonwebtoken");
 const Task = require("./models/tasks");
 const User = require("./models/user");
+const userAuth = require("./middleware/userAuth");
+const adminAuth = require("./middleware/adminAuth");
 
 mongoose
   .connect(dbURI)
@@ -13,6 +15,7 @@ mongoose
     console.log("succesfully connected to mongodb");
     const port = process.env.PORT || 3000;
 
+    // register route
     app.post("/register", async (req, res) => {
       try {
         const { username, email, password, isAdmin } = req.body;
@@ -29,6 +32,7 @@ mongoose
       }
     });
 
+    // login route with a signed token
     app.post("/login", async (req, res) => {
       const { username, password } = req.body;
       const user = await User.find(req.body.username);
@@ -54,7 +58,11 @@ mongoose
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: "1hr",
       });
+
+      res.json({ token });
     });
+
+    // horizon listener
     app.listen(port, () => {
       console.log(`horizon is listening on localhost:${port}`);
     });
