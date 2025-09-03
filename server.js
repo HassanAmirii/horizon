@@ -35,7 +35,7 @@ mongoose
     // login route with a signed token
     app.post("/login", async (req, res) => {
       const { username, password } = req.body;
-      const user = await User.find(req.body.username);
+      const user = await User.findOne({ username });
       if (!user && !(await bcrpt.compare(User.password, password))) {
         return res.status(401).json({ error: "invalid credentials" });
       }
@@ -60,6 +60,10 @@ mongoose
       });
 
       res.json({ token });
+    });
+
+    app.get("/dashboard", userAuth, (req, res) => {
+      res.status(200).json({ message: `welcome ${req.payload.username}` });
     });
 
     // horizon listener
