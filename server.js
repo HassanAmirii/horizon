@@ -70,7 +70,7 @@ mongoose
       }
     });
 
-    app.post("/task", userAuth, async (req, res) => {
+    app.post("/createTask", userAuth, async (req, res) => {
       try {
         const { title, description, owner } = req.body;
         const newTask = new Task({ title, description, owner: req.payload.id });
@@ -84,15 +84,12 @@ mongoose
       }
     });
 
-    // USER DASHBOARD (protected user route)
-    app.get("/dashboard", userAuth, (req, res) => {
-      res.status(200).json({ message: `welcome ${req.payload.username}` });
-    });
+    app.get("/getTask", userAuth, async (req, res) => {});
 
     //protected admin route: GET ALL USER PROFILE
-    app.get("/user", adminAuth, (req, res) => {
+    app.get("/user", adminAuth, async (req, res) => {
       try {
-        const users = User.find({});
+        const users = await User.find({});
         if (!users) {
           res.status(404).json({ message: "no user profile in database" });
         }
