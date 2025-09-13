@@ -1,114 +1,299 @@
-<p align="center">
-  <a href="" rel="noopener">
- <img width=200px height=200px src="https://i.imgur.com/6wj0hh6.jpg" alt="Project logo"></a>
-</p>
+# Horizon API
 
-<h3 align="center">Project Title</h3>
+## Overview
 
-<div align="center">
+Horizon is a RESTful API built with Node.js and Express.js, providing a robust backend for a task management application. It utilizes Mongoose for object data modeling with a MongoDB database and implements JWT-based authentication for secure, role-based access to endpoints.
 
-[![Status](https://img.shields.io/badge/status-active-success.svg)]()
-[![GitHub Issues](https://img.shields.io/github/issues/kylelobo/The-Documentation-Compendium.svg)](https://github.com/kylelobo/The-Documentation-Compendium/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.com/kylelobo/The-Documentation-Compendium/pulls)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
+## Features
 
-</div>
+- **Express.js**: For building the RESTful API server and managing routes.
+- **Mongoose / MongoDB**: Provides an Object Data Modeling (ODM) layer for interacting with the MongoDB database to store user and task data.
+- **JSON Web Tokens (JWT)**: Ensures secure, stateless user authentication and authorization for protected endpoints.
+- **bcrypt**: Handles secure hashing of user passwords before storage.
+- **Docker**: Includes `Dockerfile` and `docker-compose.yml` for easy containerization, ensuring a consistent and isolated development/production environment.
+
+## Getting Started
+
+This project is containerized using Docker for a streamlined setup process.
+
+### Installation
+
+1.  **Clone the repository**
+
+    ```bash
+    git clone https://github.com/HassanAmirii/horizon.git
+    cd horizon
+    ```
+
+2.  **Create an environment file**
+    Copy the example environment file to create your own configuration.
+
+    ```bash
+    cp .env.example .env
+    ```
+
+3.  **Configure environment variables**
+    Open the `.env` file and add the required values.
+
+4.  **Run with Docker Compose**
+    This command will build the images and start the Express application and MongoDB database containers.
+    ```bash
+    docker-compose up --build -d
+    ```
+    The API will be available at `http://localhost:3000`.
+
+### Environment Variables
+
+Create a `.env` file in the root directory and add the following variables.
+
+| Variable      | Description                        | Example                             |
+| :------------ | :--------------------------------- | :---------------------------------- |
+| `MONGODB_URI` | The connection string for MongoDB. | `mongodb://mongo:27017/horizon`     |
+| `PORT`        | The port the server will run on.   | `3000`                              |
+| `JWT_SECRET`  | A secret key for signing JWTs.     | `a_very_strong_and_long_secret_key` |
+
+## API Documentation
+
+### Base URL
+
+`http://localhost:3000`
+
+### Endpoints
+
+#### POST /register
+
+Creates a new user account.
+
+**Request**:
+
+```json
+{
+  "username": "newuser",
+  "email": "user@example.com",
+  "password": "strongPassword123",
+  "isAdmin": false
+}
+```
+
+**Response**:
+
+```json
+{
+  "message": "you have been succesfully registered",
+  "user": {
+    "username": "newuser",
+    "email": "user@example.com",
+    "isAdmin": false,
+    "_id": "64a4c6a6b5c2b9f3e4e9a9c9",
+    "createdAt": "2023-07-05T00:00:00.000Z",
+    "__v": 0
+  }
+}
+```
+
+**Errors**:
+
+- `500 Internal Server Error`: Could not create the user, likely due to a duplicate `username` or `email`.
 
 ---
 
-<p align="center"> Few lines describing your project.
-    <br> 
-</p>
+#### POST /login
 
-## 📝 Table of Contents
+Authenticates a user and returns a JWT.
 
-- [About](#about)
-- [Getting Started](#getting_started)
-- [Deployment](#deployment)
-- [Usage](#usage)
-- [Built Using](#built_using)
-- [TODO](../TODO.md)
-- [Contributing](../CONTRIBUTING.md)
-- [Authors](#authors)
-- [Acknowledgments](#acknowledgement)
+**Request**:
 
-## 🧐 About <a name = "about"></a>
-
-Write about 1-2 paragraphs describing the purpose of your project.
-
-## 🏁 Getting Started <a name = "getting_started"></a>
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See [deployment](#deployment) for notes on how to deploy the project on a live system.
-
-### Prerequisites
-
-What things you need to install the software and how to install them.
-
-```
-Give examples
+```json
+{
+  "username": "newuser",
+  "password": "strongPassword123"
+}
 ```
 
-### Installing
+**Response**:
 
-A step by step series of examples that tell you how to get a development env running.
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
+```json
+{
+  "message": "User logged in successfully",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YTRjNmE2YjVjMmI5ZjNlNGU5YTljOSIsInVzZXJuYW1lIjoibmV3dXNlciIsImFkbWluIjpmYWxzZSwiaWF0IjoxNjg4NTEzMjc1LCJleHAiOjE2ODg1MTY4NzV9.abcdefg..."
+}
 ```
 
-End with an example of getting some data out of the system or using it for a little demo.
+**Errors**:
 
-## 🔧 Running the tests <a name = "tests"></a>
+- `401 Unauthorized`: Invalid credentials (username or password).
+- `500 Internal Server Error`: An unexpected server error occurred.
 
-Explain how to run the automated tests for this system.
+---
 
-### Break down into end to end tests
+#### GET /users
 
-Explain what these tests test and why
+Retrieves a list of all users. Requires admin authentication.
 
+**Request**:
+
+- **Headers**: `Authorization: Bearer <admin_token>`
+
+**Response**:
+
+```json
+{
+  "message": "users succesfully retrieved ",
+  "users": [
+    {
+      "_id": "64a4c6a6b5c2b9f3e4e9a9c9",
+      "username": "newuser",
+      "email": "user@example.com",
+      "isAdmin": false,
+      "createdAt": "2023-07-05T00:00:00.000Z"
+    }
+  ]
+}
 ```
-Give an example
+
+**Errors**:
+
+- `401 Unauthorized`: Access denied. Token is missing, invalid, or does not belong to an admin user.
+- `404 Not Found`: No user profiles found in the database.
+- `500 Internal Server Error`: An unexpected server error occurred.
+
+---
+
+#### POST /create
+
+Creates a new task for the authenticated user.
+
+**Request**:
+
+- **Headers**: `Authorization: Bearer <user_token>`
+- **Body**:
+  ```json
+  {
+    "title": "My First Task",
+    "description": "This is the description for my first task."
+  }
+  ```
+
+**Response**:
+
+```json
+{
+  "message": "new task created successfully",
+  "task": {
+    "title": "My First Task",
+    "description": "This is the description for my first task.",
+    "owner": "64a4c6a6b5c2b9f3e4e9a9c9",
+    "_id": "64a4c7e7b5c2b9f3e4e9a9d1",
+    "date": "2023-07-05T00:00:00.000Z",
+    "__v": 0
+  }
+}
 ```
 
-### And coding style tests
+**Errors**:
 
-Explain what these tests test and why
+- `401 Unauthorized`: Access denied. Token is missing or invalid.
+- `500 Internal Server Error`: An unexpected server error occurred.
 
+---
+
+#### GET /read
+
+Retrieves all tasks for the authenticated user.
+
+**Request**:
+
+- **Headers**: `Authorization: Bearer <user_token>`
+
+**Response**:
+
+```json
+{
+  "message": "succesful",
+  "tasks": [
+    {
+      "_id": "64a4c7e7b5c2b9f3e4e9a9d1",
+      "title": "My First Task",
+      "description": "This is the description for my first task.",
+      "owner": "64a4c6a6b5c2b9f3e4e9a9c9",
+      "date": "2023-07-05T00:00:00.000Z"
+    }
+  ]
+}
 ```
-Give an example
+
+**Errors**:
+
+- `204 No Content`: The user has not created any tasks.
+- `401 Unauthorized`: Access denied. Token is missing or invalid.
+- `500 Internal Server Error`: An unexpected server error occurred.
+
+---
+
+#### PATCH /update/:id
+
+Updates a specific task owned by the authenticated user.
+
+**Request**:
+
+- **Headers**: `Authorization: Bearer <user_token>`
+- **URL Params**: `id=[task_id]`
+- **Body**:
+  ```json
+  {
+    "description": "An updated description for the task."
+  }
+  ```
+
+**Response**:
+
+```json
+{
+  "message": "successfully updated task",
+  "task": {
+    "_id": "64a4c7e7b5c2b9f3e4e9a9d1",
+    "title": "My First Task",
+    "description": "An updated description for the task.",
+    "owner": "64a4c6a6b5c2b9f3e4e9a9c9",
+    "date": "2023-07-05T00:00:00.000Z"
+  }
+}
 ```
 
-## 🎈 Usage <a name="usage"></a>
+**Errors**:
 
-Add notes about how to use the system.
+- `401 Unauthorized`: Access denied. Token is missing or invalid.
+- `404 Not Found`: Task with the specified ID does not exist.
+- `500 Internal Server Error`: An unexpected server error occurred.
 
-## 🚀 Deployment <a name = "deployment"></a>
+---
 
-Add additional notes about how to deploy this on a live system.
+#### DELETE /delete/:id
 
-## ⛏️ Built Using <a name = "built_using"></a>
+Deletes a specific task owned by the authenticated user.
 
-- [MongoDB](https://www.mongodb.com/) - Database
-- [Express](https://expressjs.com/) - Server Framework
-- [VueJs](https://vuejs.org/) - Web Framework
-- [NodeJs](https://nodejs.org/en/) - Server Environment
+**Request**:
 
-## ✍️ Authors <a name = "authors"></a>
+- **Headers**: `Authorization: Bearer <user_token>`
+- **URL Params**: `id=[task_id]`
 
-- [@kylelobo](https://github.com/kylelobo) - Idea & Initial work
+**Response**:
 
-See also the list of [contributors](https://github.com/kylelobo/The-Documentation-Compendium/contributors) who participated in this project.
+```json
+{
+  "message": "successfully deleted task",
+  "task": {
+    "_id": "64a4c7e7b5c2b9f3e4e9a9d1",
+    "title": "My First Task",
+    "description": "An updated description for the task.",
+    "owner": "64a4c6a6b5c2b9f3e4e9a9c9",
+    "date": "2023-07-05T00:00:00.000Z"
+  }
+}
+```
 
-## 🎉 Acknowledgements <a name = "acknowledgement"></a>
+**Errors**:
 
-- Hat tip to anyone whose code was used
-- Inspiration
-- References
+- `401 Unauthorized`: Access denied. Token is missing or invalid.
+- `404 Not Found`: Task with the specified ID does not exist.
+- `500 Internal Server Error`: An unexpected server error occurred.
