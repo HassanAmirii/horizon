@@ -33,6 +33,23 @@ mongoose
       }
     });
 
+    //protected admin route: GET ALL USER PROFILE
+    app.get("/user", adminAuth, async (req, res) => {
+      try {
+        const users = await User.find({});
+        if (!users) {
+          return res
+            .status(404)
+            .json({ message: "no user profile in database" });
+        }
+        res
+          .status(200)
+          .json({ message: "users succesfully retrieved ", users: users });
+      } catch (error) {
+        res.status(500).json({ message: error.message });
+      }
+    });
+
     // login route with a signed token
     app.post("/login", async (req, res) => {
       const { username, password } = req.body;
@@ -94,23 +111,6 @@ mongoose
             .json({ message: "no data found, please create a new task" });
         }
         res.status(200).json({ message: "succesful", tasks: myTasks });
-      } catch (error) {
-        res.status(500).json({ message: error.message });
-      }
-    });
-
-    //protected admin route: GET ALL USER PROFILE
-    app.get("/user", adminAuth, async (req, res) => {
-      try {
-        const users = await User.find({});
-        if (!users) {
-          return res
-            .status(404)
-            .json({ message: "no user profile in database" });
-        }
-        res
-          .status(200)
-          .json({ message: "users succesfully retrieved ", users: users });
       } catch (error) {
         res.status(500).json({ message: error.message });
       }
