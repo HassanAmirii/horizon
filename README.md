@@ -4,7 +4,7 @@
 
 [![Status](https://img.shields.io/badge/status-active-success.svg)](https://github.com/HassanAmirii/horizon)
 [![GitHub Issues](https://img.shields.io/github/issues/HassanAmirii/paypal.svg)](https://github.com/HassanAmirii/horizon/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/HassanAmirii/paypal.svg)](https://github.com/HassanAmirii/horizon/pulls)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/HassanAmirii/horizon.svg)](https://github.com/HassanAmirii/horizon/pulls)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 
 </div>

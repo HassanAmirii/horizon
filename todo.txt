@@ -11,7 +11,7 @@ You are required to develop a RESTful API with following endpoints
     Use a database to store the user and to-do list data (you can use any database of your choice)✅
     Implement proper data validation✅
     Implement pagination and filtering for the to-do list
-    write a good readme
+    write a good readme✅
 
 
 
