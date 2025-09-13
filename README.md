@@ -1,8 +1,22 @@
-# Horizon API
+<h1 align="center">Horizon API</h1>
 
-## Overview
+<div align="center">
+
+[![Status](https://img.shields.io/badge/status-active-success.svg)](https://github.com/HassanAmirii/horizon)
+[![GitHub Issues](https://img.shields.io/github/issues/HassanAmirii/paypal.svg)](https://github.com/HassanAmirii/horizon/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/HassanAmirii/paypal.svg)](https://github.com/HassanAmirii/horizon/pulls)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
+
+</div>
+
+---
+
+<p align="center">
 
 Horizon is a RESTful API built with Node.js and Express.js, providing a robust backend for a task management application. It utilizes Mongoose for object data modeling with a MongoDB database and implements JWT-based authentication for secure, role-based access to endpoints.
+<br>
+
+</p>
 
 ## Features
 
