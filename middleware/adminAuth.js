@@ -13,7 +13,7 @@ const adminAuth = (req, res, next) => {
       res.status(401).json({ message: "could not find token in auth header" });
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decoded.isAdmin === true) {
+    if (decoded["isAdmin"] !== true) {
       return res.status(401).json({ message: "access denied, not an admin" });
     }
     req.payload = decoded;

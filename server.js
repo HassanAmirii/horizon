@@ -1,6 +1,7 @@
 require("dotenv").config();
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
+
 const app = require("./middleware/app");
 const dbURI = process.env.MONGODB_URI;
 const jwt = require("jsonwebtoken");
@@ -72,7 +73,7 @@ mongoose
 
     app.post("/createTask", userAuth, async (req, res) => {
       try {
-        const { title, description, owner } = req.body;
+        const { title, description } = req.body;
         const newTask = new Task({ title, description, owner: req.payload.id });
         await newTask.save();
 
@@ -84,14 +85,28 @@ mongoose
       }
     });
 
-    app.get("/getTask", userAuth, async (req, res) => {});
+    app.get("/getTask", userAuth, async (req, res) => {
+      try {
+        const myTasks = await Task.find({ owner: req.payload.id });
+        if (myTasks === 0) {
+          return res
+            .status(204)
+            .json({ message: "no data found, please create a new task" });
+        }
+        res.status(200).json({ message: "succesful", tasks: myTasks });
+      } catch (error) {
+        res.status(500).json({ message: error.message });
+      }
+    });
 
     //protected admin route: GET ALL USER PROFILE
     app.get("/user", adminAuth, async (req, res) => {
       try {
         const users = await User.find({});
         if (!users) {
-          res.status(404).json({ message: "no user profile in database" });
+          return res
+            .status(404)
+            .json({ message: "no user profile in database" });
         }
         res
           .status(200)
