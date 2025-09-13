@@ -34,7 +34,7 @@ mongoose
     });
 
     //protected admin route: GET ALL USER PROFILE
-    app.get("/user", adminAuth, async (req, res) => {
+    app.get("/users", adminAuth, async (req, res) => {
       try {
         const users = await User.find({});
         if (!users) {
@@ -88,7 +88,8 @@ mongoose
       }
     });
 
-    app.post("/createTask", userAuth, async (req, res) => {
+    // create a new task as a user
+    app.post("/create", userAuth, async (req, res) => {
       try {
         const { title, description } = req.body;
         const newTask = new Task({ title, description, owner: req.payload.id });
@@ -102,7 +103,8 @@ mongoose
       }
     });
 
-    app.get("/getTask", userAuth, async (req, res) => {
+    // get all your tasks as a user
+    app.get("/read", userAuth, async (req, res) => {
       try {
         const myTasks = await Task.find({ owner: req.payload.id });
         if (myTasks === 0) {
@@ -111,6 +113,51 @@ mongoose
             .json({ message: "no data found, please create a new task" });
         }
         res.status(200).json({ message: "succesful", tasks: myTasks });
+      } catch (error) {
+        res.status(500).json({ message: error.message });
+      }
+    });
+
+    // update your task as a user
+
+    app.patch("/update/:id", userAuth, async (req, res) => {
+      const id = req.params.id;
+      const updateData = req.body;
+
+      try {
+        const updateTask = await Task.findByIdAndUpdate(id, updateData, {
+          new: true,
+          runValidators: true,
+        });
+        if (!updateTask) {
+          return res.status(404).json({
+            message: "task doesnt exist",
+          });
+        }
+
+        res
+          .status(200)
+          .json({ message: "successfully updated task", task: updateTask });
+      } catch (error) {
+        res.status(500).json({ message: error.message });
+      }
+    });
+
+    // delete task as a user
+    app.delete("/delete/:id", userAuth, async (req, res) => {
+      const id = req.params.id;
+
+      try {
+        const deleteTask = await Task.findByIdAndDelete(id);
+        if (!deleteTask) {
+          return res.status(404).json({
+            message: "task doesnt exist",
+          });
+        }
+
+        res
+          .status(200)
+          .json({ message: "successfully deleted task", task: deleteTask });
       } catch (error) {
         res.status(500).json({ message: error.message });
       }
